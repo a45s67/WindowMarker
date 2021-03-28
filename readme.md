@@ -10,9 +10,8 @@ Just execute main.ahk (double click / exec from command line / vscode debugger)
 
 ## Key Shortcuts
 
+#### Mark window you are focusing / Toggle the window
 <kbd>Alt</kbd>+<kbd>0</kbd> ~ <kbd>Alt</kbd>+<kbd>9</kbd> 
-1. Mark the window you are focusing now.
-2. After marking, the next time you press this key will toggle the corresponding window.
 
+#### Cancel the mark
 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd> ~ <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>9</kbd> 
-- Cancel the mark
