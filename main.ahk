@@ -78,6 +78,48 @@ class WindowMarker{
 }
 
 
+class StateRecorder{
+  winobj_map := {}
+  RestoreStates(){
+      
+  }
+  Insert(id){
+
+  }
+  Get(id){
+
+  }
+  Delete(id){
+
+  }
+
+}
+
+class Layout{
+  marker := new WindowMarker()
+  window_states := new StateRecoder()
+  ;======= marker ======
+  MarkOrToggleWindow(key){
+    this.marker.MarkOrToggleWindow(key)
+  }
+  RemoveMark(key){
+    this.marker.RemoveMark(key)
+  }
+  ;======= state ========
+  RecodeFocusedWindow(){
+    WinGet, id, ID, A
+    this.window_states.Insert(id) 
+  }
+  DetachFocusedWindow(){
+    WinGet, id, ID, A
+    this.window_states.Delete(id) 
+  }
+  RestoreRecodedLayout(){
+    this.window_states.RestoreStates() 
+  }
+}
+
+
 marker := new WindowMarker()
 !m::marker.MarkFocuseWindow()
 !a::marker.ToggleWindow()
