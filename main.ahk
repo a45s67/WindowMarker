@@ -1,3 +1,8 @@
+Log(func,msg){
+  OutputDebug, [%func%]%msg%
+}
+
+
 CheckDllError(){
   if ErrorLevel{
     Log("DLL", "err" ErrorLevel)
@@ -5,11 +10,12 @@ CheckDllError(){
 }
 
 SetUpHotkey(hk, handler) {
-    Hotkey, %hk%, %handler%, UseErrorLevel
-    if (ErrorLevel <> 0) {
-        MsgBox, 16, Error, Some Error occur when setting %hk% 
-        Exit
-    }
+  Log("SetUpHotKey","Set key bind:" hk )  
+  Hotkey, %hk%, %handler%, Off
+  if (ErrorLevel <> 0) {
+      MsgBox, 16, Error, Some Error occur when setting %hk% 
+      Exit
+  }
 }
 
 
@@ -28,10 +34,6 @@ CheckDllError()
 ; GetCurrentDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "GetCurrentDesktopNumber", "Ptr")
 
 
-
-Log(func,msg){
-  OutputDebug, [%func%]%msg%
-}
 
 class WindowObject{
   info := {}
@@ -214,18 +216,34 @@ class DesktopUtil{
 marker := new WindowMarker()
 desktop_util := new DesktopUtil()
 
-#::return
 
 Loop ,7
 {
   key := A_Index
-  SetUpHotkey("#" . key, desktop_util.SwitchToDesktop(key)) 
-  SetUpHotkey("!" . key, desktop_util.MarkOrToggleWindow(key)) 
-  SetUpHotkey("^!" . key, desktop_util.RemoveMark(key)) 
+
+  ; SetUpHotkey("#" . key, desktop_util.SwitchToDesktop(key)) 
+  ; SetUpHotkey("!" . key, desktop_util.MarkOrToggleWindow(key)) 
+  ; SetUpHotkey("^!" . key, desktop_util.RemoveMark(key)) 
+  Hotkey, #%key%, SetKeyBindSwitchToDesktop
+  Hotkey, !%key%, SetKeyBindMarkOrToggleWindow
+  Hotkey, ^!%key%, SetKeyBindRemoveMark
 
 }
 
+SetKeyBindSwitchToDesktop:
+  desktop_util.SwitchToDesktop(SubStr(A_ThisHotkey,2) - 1)
+return 
 
+SetKeyBindMarkOrToggleWindow:
+  desktop_util.MarkOrToggleWindow(A_ThisHotkey)
+return 
+
+SetKeyBindRemoveMark:
+  desktop_util.RemoveMark(A_ThisHotkey)
+return 
+
+
+#::return
 
 ; #0::desktop_util.SwitchToDesktop("0")
 
