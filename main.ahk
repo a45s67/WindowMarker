@@ -1,3 +1,33 @@
+CheckDllError(){
+  if ErrorLevel{
+    Log("DLL", "err" ErrorLevel)
+  }
+}
+
+SetUpHotkey(hk, handler) {
+    Hotkey, %hk%, %handler%, UseErrorLevel
+    if (ErrorLevel <> 0) {
+        MsgBox, 16, Error, Some Error occur when setting %hk% 
+        Exit
+    }
+}
+
+
+handle_virtual_desktop := DllCall("LoadLibrary", "Str", "C:\Users\Fish\github\WindowMarker\VirtualDesktopAccessor.dll", "Ptr") 
+CheckDllError()
+
+GoToDesktopNumber := DllCall("GetProcAddress", "Ptr", handle_virtual_desktop, "AStr", "GoToDesktopNumber", "Ptr")
+CheckDllError()
+
+GetCurrentDesktopNumber  := DllCall("GetProcAddress", Ptr, handle_virtual_desktop, AStr, "GetCurrentDesktopNumber", "Ptr")
+CheckDllError()
+
+
+; hVirtualDesktopAccessor := DllCall("LoadLibrary", Str, "C:\Users\Fish\github\WindowMarker\VirtualDesktopAccessor.dll", "Ptr") 
+; GoToDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "GoToDesktopNumber", "Ptr")
+; GetCurrentDesktopNumberProc := DllCall("GetProcAddress", Ptr, hVirtualDesktopAccessor, AStr, "GetCurrentDesktopNumber", "Ptr")
+
+
 
 Log(func,msg){
   OutputDebug, [%func%]%msg%
@@ -23,13 +53,26 @@ class WindowObject{
   }
 }
 
-
+class WindowState extends WindowObject{
+  __New(id){
+    this.info.id:=id
+    Log("WindowsState", "Construct: " id)
+  }
+  __Delete(){
+    Log("WindowsState", "obj: " this.info.id ", Destruct. " )
+  }
+}
 
 class WindowMarker{
   last_activate_winobj := {}
 
   marked_winobj_map := {}
-
+  __New(){
+    Log("WindowMarker","Create Marker")
+  }
+  __Delete(){
+    Log("WindowMarker","Destruct Marker")
+  }
   MarkFocuseWindow(mark_key := "a"){
     WinGet, getid, ID, A
     this.marked_winobj_map[mark_key] := new WindowObject(getid)
@@ -81,6 +124,7 @@ class WindowMarker{
 class StateRecorder{
   winobj_map := {}
   RestoreStates(){
+
       
   }
   Insert(id){
@@ -120,28 +164,103 @@ class Layout{
 }
 
 
+
+class DesktopUtil{
+  markers := {}
+
+  GetCurrentDesktopNumber(){
+    global GetCurrentDesktopNumber,GoToDesktopNumber
+    id := DllCall(GetCurrentDesktopNumber,UInt)
+    return id
+  }
+
+  SetDesktopRecoder(){
+    id := this.GetCurrentDesktopNumber()
+    if (!this.markers.HasKey(id)){
+      this.markers[id] := new WindowMarker()
+      Log("SetDesktopRecoder","new desk recode " id)
+    }
+    Log("SetDesktopRecoder","cur id " id)
+  }
+
+  MarkOrToggleWindow(key){
+    this.SetDesktopRecoder()
+
+    id := this.GetCurrentDesktopNumber()
+
+    marker := this.markers[id]
+    marker.MarkOrToggleWindow(key)
+  }
+
+  RemoveMark(key){
+    this.SetDesktopRecoder()
+
+    id := this.GetCurrentDesktopNumber()
+
+    marker := this.markers[id]
+    marker.RemoveMark(key)
+
+  }
+  SwitchToDesktop(key){
+    global GetCurrentDesktopNumber,GoToDesktopNumber
+    DllCall(GoToDesktopNumber,UInt,key)
+    Log("DesktopUtil - SwitchToDesktop", key)
+  }
+
+}
+
+
+
 marker := new WindowMarker()
-!m::marker.MarkFocuseWindow()
-!a::marker.ToggleWindow()
+desktop_util := new DesktopUtil()
 
-!0::marker.MarkOrToggleWindow("0")
-!1::marker.MarkOrToggleWindow("1")
-!2::marker.MarkOrToggleWindow("2")
-!3::marker.MarkOrToggleWindow("3")
-!4::marker.MarkOrToggleWindow("4")
-!5::marker.MarkOrToggleWindow("5")
-!6::marker.MarkOrToggleWindow("6")
-!7::marker.MarkOrToggleWindow("7")
-!8::marker.MarkOrToggleWindow("8")
-!9::marker.MarkOrToggleWindow("9")
+#::return
 
-^!0::marker.RemoveMark("0")
-^!1::marker.RemoveMark("1")
-^!2::marker.RemoveMark("2")
-^!3::marker.RemoveMark("3")
-^!4::marker.RemoveMark("4")
-^!5::marker.RemoveMark("5")
-^!6::marker.RemoveMark("6")
-^!7::marker.RemoveMark("7")
-^!8::marker.RemoveMark("8")
-^!9::marker.RemoveMark("9")
+Loop ,7
+{
+  key := A_Index
+  SetUpHotkey("#" . key, desktop_util.SwitchToDesktop(key)) 
+  SetUpHotkey("!" . key, desktop_util.MarkOrToggleWindow(key)) 
+  SetUpHotkey("^!" . key, desktop_util.RemoveMark(key)) 
+
+}
+
+
+
+; #0::desktop_util.SwitchToDesktop("0")
+
+; #1::desktop_util.SwitchToDesktop("1")
+
+; !0::desktop_util.MarkOrToggleWindow("0")
+; !1::desktop_util.MarkOrToggleWindow("1")
+; !2::desktop_util.MarkOrToggleWindow("2")
+; !3::desktop_util.MarkOrToggleWindow("3")
+; !4::desktop_util.MarkOrToggleWindow("4")
+
+
+; SetUpHotkey(hk, handler) 
+; !m::marker.MarkFocuseWindow()
+; !a::marker.ToggleWindow()
+
+; !0::marker.MarkOrToggleWindow("0")
+; !1::marker.MarkOrToggleWindow("1")
+; !2::marker.MarkOrToggleWindow("2")
+; !3::marker.MarkOrToggleWindow("3")
+; !4::marker.MarkOrToggleWindow("4")
+; !5::marker.MarkOrToggleWindow("5")
+; !6::marker.MarkOrToggleWindow("6")
+; !7::marker.MarkOrToggleWindow("7")
+; !8::marker.MarkOrToggleWindow("8")
+; !9::marker.MarkOrToggleWindow("9")
+
+; ^!0::marker.RemoveMark("0")
+; ^!1::marker.RemoveMark("1")
+; ^!2::marker.RemoveMark("2")
+; ^!3::marker.RemoveMark("3")
+; ^!4::marker.RemoveMark("4")
+; ^!5::marker.RemoveMark("5")
+; ^!6::marker.RemoveMark("6")
+; ^!7::marker.RemoveMark("7")
+; ^!8::marker.RemoveMark("8")
+; ^!9::marker.RemoveMark("9")
+
