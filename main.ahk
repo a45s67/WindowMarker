@@ -9,17 +9,8 @@ CheckDllError(){
   }
 }
 
-SetUpHotkey(hk, handler) {
-  Log("SetUpHotKey","Set key bind:" hk )  
-  Hotkey, %hk%, %handler%, Off
-  if (ErrorLevel <> 0) {
-      MsgBox, 16, Error, Some Error occur when setting %hk% 
-      Exit
-  }
-}
 
-
-handle_virtual_desktop := DllCall("LoadLibrary", "Str", "C:\Users\Fish\github\WindowMarker\VirtualDesktopAccessor.dll", "Ptr") 
+handle_virtual_desktop := DllCall("LoadLibrary", "Str", "VirtualDesktopAccessor.dll", "Ptr") 
 CheckDllError()
 
 GoToDesktopNumber := DllCall("GetProcAddress", "Ptr", handle_virtual_desktop, "AStr", "GoToDesktopNumber", "Ptr")
