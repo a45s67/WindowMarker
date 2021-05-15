@@ -234,7 +234,7 @@ SetKeyBindRemoveMark:
 return 
 
 
-#::return
+; #::return
 
 ; #0::desktop_util.SwitchToDesktop("0")
 
