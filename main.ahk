@@ -226,11 +226,11 @@ SetKeyBindSwitchToDesktop:
 return 
 
 SetKeyBindMarkOrToggleWindow:
-  desktop_util.MarkOrToggleWindow(A_ThisHotkey)
+  desktop_util.MarkOrToggleWindow(SubStr(A_ThisHotkey,2) - 1)
 return 
 
 SetKeyBindRemoveMark:
-  desktop_util.RemoveMark(A_ThisHotkey)
+  desktop_util.RemoveMark(SubStr(A_ThisHotkey,3) - 1)
 return 
 
 
