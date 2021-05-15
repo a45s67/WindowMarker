@@ -18,3 +18,7 @@ Just execute main.ahk (double click / exec from command line / vscode debugger)
 
 #### Cancel the mark
 <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>0</kbd> ~ <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>7</kbd> 
+
+
+## Install
+https://www.onmsft.com/how-to/how-to-automatically-launch-an-app-when-you-login-to-windows-10
